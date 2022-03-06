@@ -23,6 +23,7 @@ func SetupRouter(env *handler.Env) *mux.Router {
 	api.Handle("/article", handler.New(env, handler.CreateArticleHandler)).Methods(http.MethodPost)
 
 	api.Handle("/category", handler.New(env, handler.CreateCategoryHandler)).Methods(http.MethodPost)
+	api.Handle("/category/{id:[0-9]+}", handler.New(env, handler.DeleteCategoryHandler)).Methods(http.MethodDelete)
 
 	return r
 }

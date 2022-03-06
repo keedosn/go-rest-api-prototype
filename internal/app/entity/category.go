@@ -5,8 +5,14 @@ import (
 )
 
 type Category struct {
-	ID         int
-	Name       string
-	CreateDate time.Time
-	ModifyDate time.Time
+	ID         int       `json:"id"`
+	Name       string    `json:"name"`
+	CreateDate time.Time `json:"create_date"`
+	ModifyDate time.Time `json:"modify_date"` // FIXME
 }
+
+// func (c Category) Validate() error {
+// 	return validation.ValidateStruct(&c,
+// 		validation.Field(&c.Name, validation.Required, validation.Length(3, 255)),
+// 	)
+// }

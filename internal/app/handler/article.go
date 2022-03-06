@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 	"time"
 
@@ -30,19 +31,28 @@ type CreateArticleResponse struct {
 	Err    string          `json:"err,omitempty"`
 }
 
-func CreateArticleHandlerFunc(env *Env, req interface{}, w http.ResponseWriter) (interface{}, error) {
-	// var art = req.(*CreateArticleRequest)
-	// doSthWith(art)
+func CreateArticleHandlerFunc(h *Handler, w http.ResponseWriter) (interface{}, int, error) {
+	var art = h.Request.(*CreateArticleRequest)
+	log.Println(art)
 
-	return &CreateArticleResponse{
-		Status: http.StatusText(http.StatusOK),
-		Data: &entity.Article{
-			ID:         1,
-			CategoryID: 1,
-			Title:      "Dummy article",
-			Intro:      "Intro",
-			Text:       "Text",
-			CreateDate: time.Now(),
-		},
-	}, nil
+	return &entity.Article{
+		ID:         1,
+		CategoryID: 1,
+		Title:      "Dummy article",
+		Intro:      "Intro",
+		Text:       "Text",
+		CreateDate: time.Now(),
+	}, http.StatusCreated, nil
+
+	// return &CreateArticleResponse{
+	// 	Status: http.StatusText(http.StatusOK),
+	// 	Data: &entity.Article{
+	// 		ID:         1,
+	// 		CategoryID: 1,
+	// 		Title:      "Dummy article",
+	// 		Intro:      "Intro",
+	// 		Text:       "Text",
+	// 		CreateDate: time.Now(),
+	// 	},
+	// }, http.StatusCreated, nil
 }

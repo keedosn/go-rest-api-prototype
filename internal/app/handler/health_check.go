@@ -26,11 +26,15 @@ type HealthCheckResponseBody struct {
 	Message string `json:"message,omitempty"`
 }
 
-func HealthCheckHandlerFunc(_ *Env, _ interface{}, w http.ResponseWriter) (interface{}, error) {
-	return &HealthCheckResponse{
-		Status: http.StatusText(http.StatusOK),
-		Data: &HealthCheckResponseBody{
-			Message: "This is welcome health message. Everything seems to be alright ;)",
-		},
-	}, nil
+func HealthCheckHandlerFunc(_ *Handler, w http.ResponseWriter) (interface{}, int, error) {
+	return &HealthCheckResponseBody{
+		Message: "This is welcome health message. Everything seems to be alright ;)",
+	}, http.StatusOK, nil
+
+	// return &HealthCheckResponse{
+	// 	Status: http.StatusText(http.StatusOK),
+	// 	Data: &HealthCheckResponseBody{
+	// 		Message: "This is welcome health message. Everything seems to be alright ;)",
+	// 	},
+	// }, http.StatusOK, nil
 }

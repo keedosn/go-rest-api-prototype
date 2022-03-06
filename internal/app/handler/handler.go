@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -15,27 +16,38 @@ type Env struct {
 	DB   *pgxpool.Pool
 }
 
-type HandlerFunc func(e *Env, req interface{}, w http.ResponseWriter) (interface{}, error)
-
 type Handler struct {
 	*Env
 	Handle   HandlerFunc
 	Request  interface{}
 	Response interface{}
+	Params   Set
 }
 
-func New(env *Env, h *Handler) *Handler {
-	return &Handler{env, h.Handle, h.Request, h.Response}
+type HandlerFunc func(h *Handler, w http.ResponseWriter) (interface{}, int, error)
+
+type Set map[string]string
+
+type response struct {
+	Status int
+	Data   interface{}
 }
 
-func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if err := decodeRequestData(r, &h.Request); err != nil {
-		log.Println(err.Error())
+func New(e *Env, h *Handler) *Handler {
+	return &Handler{e, h.Handle, h.Request, h.Response, Set{}}
+}
+
+func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if err := decodeRequestData(r, h.Request); err != nil {
+		log.Println("err_ServeHTTP:", err.Error())
+
+		w.WriteHeader(http.StatusInternalServerError)
 	}
 
-	res, err := h.Handle(h.Env, h.Request, w)
+	h.Params = mux.Vars(r)
+	res, code, err := h.Handle(h, w)
 
-	encodeResponse(w, res, err)
+	encodeResponse(w, &response{code, res}, err)
 }
 
 func decodeRequestData(r *http.Request, v interface{}) error {
@@ -43,32 +55,23 @@ func decodeRequestData(r *http.Request, v interface{}) error {
 	rdr := ioutil.NopCloser(bytes.NewReader(buf))
 	r.Body = ioutil.NopCloser(bytes.NewReader(buf))
 
-	if len(buf) == 0 {
-		// log.Println("empty request body1") //FIXME #1
-
-		return nil
-	}
-
-	if err := json.NewDecoder(rdr).Decode(&v); err != nil {
-		return err
-	}
+	json.NewDecoder(rdr).Decode(&v)
 
 	return nil
 }
 
-func encodeResponse(w http.ResponseWriter, res interface{}, err error) {
+func encodeResponse(w http.ResponseWriter, res *response, err error) {
 	if err != nil {
-		encodeError(w, err)
+		encodeError(w, res.Status, err)
 		return
 	}
 
-	json.NewEncoder(w).Encode(res)
+	w.WriteHeader(res.Status)
+	json.NewEncoder(w).Encode(res.Data)
 }
 
-func encodeError(w http.ResponseWriter, e error) {
-	w.WriteHeader(http.StatusInternalServerError)
+func encodeError(w http.ResponseWriter, status int, e error) {
+	w.WriteHeader(status)
 
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"error": e.Error(),
-	})
+	json.NewEncoder(w).Encode(Error(e.Error()))
 }

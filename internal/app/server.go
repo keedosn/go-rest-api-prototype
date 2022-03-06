@@ -34,8 +34,6 @@ func (s *Server) Start() {
 	}
 }
 
-func (s *Server) ExecuteHandler() {}
-
 // func (s *Server) Shutdown(ctx context.Context) {
 // 	log.Println("Shutting down...")
 
@@ -59,16 +57,22 @@ func ValidateJsonBodyMiddleware(next http.Handler) http.Handler {
 		buf, _ := ioutil.ReadAll(r.Body)
 		r.Body = ioutil.NopCloser(bytes.NewReader(buf)) // rollack *Request to original state
 
-		if len(buf) == 0 {
-			// log.Println("empty request body2") // FIXME #1
-			next.ServeHTTP(w, r)
+		// if len(buf) > 0 {
+		// 	next.ServeHTTP(w, r)
 
-			return
-		}
+		// 	return
+		// }
 
-		if !json.Valid(buf) {
-			log.Println("Unable to parse JSON: ", string(buf))
-			w.WriteHeader(http.StatusInternalServerError)
+		// if !json.Valid(buf) {
+		// 	w.WriteHeader(http.StatusBadRequest)
+		// 	json.NewEncoder(w).Encode(handler.Error("Unable to parse JSON: " + string(buf)))
+
+		// 	return
+		// }
+
+		if len(buf) > 0 && !json.Valid(buf) {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(handler.Error("Unable to parse JSON: " + string(buf)))
 
 			return
 		}
