@@ -8,7 +8,7 @@ type Category struct {
 	ID         int       `json:"id"`
 	Name       string    `json:"name"`
 	CreateDate time.Time `json:"create_date"`
-	ModifyDate time.Time `json:"modify_date"` // FIXME
+	ModifyDate time.Time `json:"modify_date"` // FIXME: zero-value issue
 }
 
 // func (c Category) Validate() error {

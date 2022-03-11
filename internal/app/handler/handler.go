@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 
+	def "git.pbiernat.dev/golang/rest-api-prototype/internal/app/definition"
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
@@ -39,7 +40,7 @@ func New(e *Env, h *Handler) *Handler {
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err := decodeRequestData(r, h.Request); err != nil {
-		log.Println("err_ServeHTTP:", err.Error())
+		log.Println("Decode request data error:", err.Error())
 
 		w.WriteHeader(http.StatusInternalServerError)
 	}
@@ -73,5 +74,5 @@ func encodeResponse(w http.ResponseWriter, res *response, err error) {
 func encodeError(w http.ResponseWriter, status int, e error) {
 	w.WriteHeader(status)
 
-	json.NewEncoder(w).Encode(Error(e.Error()))
+	json.NewEncoder(w).Encode(def.Error(e.Error()))
 }

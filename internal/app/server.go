@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	def "git.pbiernat.dev/golang/rest-api-prototype/internal/app/definition"
 	"git.pbiernat.dev/golang/rest-api-prototype/internal/app/handler"
 )
 
@@ -34,14 +35,6 @@ func (s *Server) Start() {
 	}
 }
 
-// func (s *Server) Shutdown(ctx context.Context) {
-// 	log.Println("Shutting down...")
-
-// 	if err := s.Shutdown(ctx); err != nil {
-// 		log.Panicln(err)
-// 	}
-// }
-
 func PrepareHeadersMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -57,22 +50,9 @@ func ValidateJsonBodyMiddleware(next http.Handler) http.Handler {
 		buf, _ := ioutil.ReadAll(r.Body)
 		r.Body = ioutil.NopCloser(bytes.NewReader(buf)) // rollack *Request to original state
 
-		// if len(buf) > 0 {
-		// 	next.ServeHTTP(w, r)
-
-		// 	return
-		// }
-
-		// if !json.Valid(buf) {
-		// 	w.WriteHeader(http.StatusBadRequest)
-		// 	json.NewEncoder(w).Encode(handler.Error("Unable to parse JSON: " + string(buf)))
-
-		// 	return
-		// }
-
 		if len(buf) > 0 && !json.Valid(buf) {
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(handler.Error("Unable to parse JSON: " + string(buf)))
+			json.NewEncoder(w).Encode(def.Error("Unable to parse JSON: " + string(buf)))
 
 			return
 		}

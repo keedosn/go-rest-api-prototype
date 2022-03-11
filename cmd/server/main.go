@@ -9,24 +9,24 @@ import (
 	"time"
 
 	"git.pbiernat.dev/golang/rest-api-prototype/internal/app"
+	"git.pbiernat.dev/golang/rest-api-prototype/internal/app/config"
 	"git.pbiernat.dev/golang/rest-api-prototype/internal/app/database"
 	"git.pbiernat.dev/golang/rest-api-prototype/internal/app/handler"
-	"github.com/joho/godotenv"
 )
 
-const ( // FIXME
-	defaultHTTPPort    = "8080"
-	defaultDatabaseUrl = "postgres://postgres:12345678@127.0.0.1:5434/S7"
+const (
+	defHttpIp   = "127.0.0.1"
+	defHttpPort = "8080"
+	defDbUrl    = "postgres://postgres:postgres@127.0.0.1:5432/Api" // FIXME use default container conf in future
 )
 
 func main() {
-	err := godotenv.Load(".env")
-	if err != nil {
+	if config.ErrLoadingEnvs != nil {
 		log.Fatalln("Error loading .env file")
 	}
 
-	httpAddr := net.JoinHostPort("127.0.0.1", getEnv("HTTP_PORT", defaultHTTPPort))
-	dbConnStr := getEnv("DATABASE_URL", defaultDatabaseUrl)
+	httpAddr := net.JoinHostPort(config.GetEnv("SERVER_IP", defHttpIp), config.GetEnv("SERVER_PORT", defHttpPort))
+	dbConnStr := config.GetEnv("DATABASE_URL", defDbUrl)
 
 	dbc, err := database.Connect(dbConnStr)
 	if err != nil {
@@ -47,13 +47,4 @@ func main() {
 
 	srv.Shutdown(ctx)
 	os.Exit(0)
-}
-
-func getEnv(name, defVal string) string {
-	env := os.Getenv(name)
-	if env == "" {
-		return defVal
-	}
-
-	return env
 }
