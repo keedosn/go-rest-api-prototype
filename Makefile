@@ -1,4 +1,4 @@
-.PHONY: test
+.PHONY: run race build test bench-cpu bench-mem bench-trace bench-clean
 
 run:
 	go run cmd/server/main.go
@@ -7,7 +7,7 @@ race:
 	go run --race cmd/server/main.go
 
 build:
-	go build cmd/server/main.go
+	go build -o build/server cmd/server/main.go
 
 test:
 	go test -v -run=. test/**/*.go
@@ -26,6 +26,9 @@ bench-trace:
 
 bench-clean:
 	rm -f test/data/*.out test/data/bench.log
+
+clean:
+	rm -rf build
 
 # run-profiler:
 # 	go run cmd/server/main.go -cpuprofile cpu.prof -memprofile mem.prof

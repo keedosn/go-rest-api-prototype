@@ -1,6 +1,6 @@
-!/**/.gitkeep
-
 /.idea
-.env
-/vendor
+
+/.env
+/build/*
 /test/data/*
+/vendor
