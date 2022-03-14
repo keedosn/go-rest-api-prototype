@@ -18,9 +18,5 @@ func TestCreateArticleHandler(t *testing.T) {
 		if responseRecorder.Code != http.StatusCreated {
 			t.Errorf("Want status '%d', got '%d'", http.StatusCreated, responseRecorder.Code)
 		}
-
-		// if strings.TrimSpace(responseRecorder.Body.String()) != tc.want {
-		// 	t.Errorf("Want '%s', got '%s'", tc.want, responseRecorder.Body)
-		// }
 	})
 }
