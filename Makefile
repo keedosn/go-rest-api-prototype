@@ -1,3 +1,5 @@
+.PHONY: test
+
 run:
 	go run cmd/server/main.go
 
@@ -7,7 +9,7 @@ race:
 build:
 	go build cmd/server/main.go
 
-tests:
+test:
 	go test -v -run=. test/**/*.go
 
 bench: bench-clean
